@@ -1,0 +1,45 @@
+name: Continuous delivery
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**/*.md'
+
+jobs:
+  ci:
+    uses: ./.github/workflows/on-push.yaml
+
+  release:
+    name: Release ${{ needs.ci.outputs.version }}
+    if: github.ref_name == 'main'
+    needs: ci
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up git user
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+      - run: |
+          git tag -f "${{ needs.ci.outputs.version }}"
+          git push -f origin "${{ needs.ci.outputs.version }}"
+      - uses: actions/download-artifact@v2
+        with:
+          name: fonts
+      - name: Zip fonts
+        run: |
+          cd dist
+          cp ../LICENSE ../changelog.md .
+          zip -r ../FiraCodeNerdFont.zip .
+      - name: Release
+        id: release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ needs.ci.outputs.version }}
+          generate_release_notes: true
+          files: |
+            FiraCodeNerdFont.zip
