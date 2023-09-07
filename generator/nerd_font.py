@@ -10,7 +10,7 @@ def patch_nerd_font(patch_files: list[str], stage_dir: str):
     for file in patch_files:
         args = ['--careful', '--complete']
         if 'CI' in os.environ and os.environ['CI'] == 'true':
-            args.append('--no-progressbars')
+            args.append('--quite')
         args.append(file)
         process = Popen([nerd_font_patcher_exec, *args], shell=False, cwd=stage_dir)
         process.communicate()
