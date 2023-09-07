@@ -21,7 +21,7 @@ The build.py performs the following steps:
 
 1. Download
    1. Nerd Fonts patched from [Nerd Fonts releases] [^1]
-   2. FiraCode from [FiraCode release] [^2]
+   2. FiraCode from [FiraCode releases] [^2]
 2. Patch Fira Code font variants with
    1. Tweaks to characters `i` and `l`. see sfd files in [patches] for details
    2. Swap glyphs within Fire Code font variants to become default instead of style variants
