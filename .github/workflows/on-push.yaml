@@ -24,9 +24,11 @@ jobs:
         with:
           python-version: 3.x
           cache: 'pip'
-      - run: pip install -r requirements.txt
       - name: Install dependencies
-        run: sudo apt-get install -y fontforge python3-fontforge
+        run: |
+          sudo apt-get install -y fontforge python3-fontforge
+          python -c 'import fontforge; print "FontForge works in Python"'
+          pip install -r requirements.txt
       - name: Cache downloads
         id: cache-downloads
         uses: actions/cache@v3
