@@ -24,7 +24,7 @@ jobs:
         with:
           python-version: 3.x
       - name: Install dependencies
-        run: apt-get install -y fontforge python3-fontforge
+        run: sudo apt-get install -y fontforge python3-fontforge
       - name: Cache downloads
         id: cache-downloads
         uses: actions/cache@v3
