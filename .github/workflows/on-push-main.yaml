@@ -27,7 +27,7 @@ jobs:
       - run: |
           git tag -f "${{ needs.ci.outputs.version }}"
           git push -f origin "${{ needs.ci.outputs.version }}"
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: fonts
       - name: Zip fonts
