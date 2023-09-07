@@ -19,11 +19,10 @@ jobs:
     outputs:
       version: ${{ steps.build.outputs.version }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
         with:
           python-version: 3.x
-          cache: 'pip'
       - name: Install dependencies
         run: apt-get install -y fontforge python3-fontforge
       - name: Cache downloads
@@ -35,7 +34,7 @@ jobs:
       - name: Build
         id: build
         run: ./build.py
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: fonts
           path: dist
