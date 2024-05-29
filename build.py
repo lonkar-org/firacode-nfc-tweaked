@@ -6,7 +6,7 @@ from generator import generate
 
 versions = {
     'fira_code': '6.2',
-    'nerd_font_patcher': 'v3.1.1',
+    'nerd_font_patcher': 'v3.2.1',
 }
 
 
