@@ -29,7 +29,7 @@ jobs:
           git tag -f "${{ needs.ci.outputs.version }}"
           git push -f origin "${{ needs.ci.outputs.version }}"
           mkdir dist
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: fonts
           path: dist
@@ -40,7 +40,7 @@ jobs:
           zip -r ../FiraCodeNerdFont.zip .
       - name: Release
         id: release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.ci.outputs.version }}
           generate_release_notes: true
