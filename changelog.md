@@ -2,6 +2,15 @@ CHANGELOG
 ================================================================================
 This project's version depends on the version of the fonts it uses.
 
+## v6.2+v3.2.1
+
+* Bump nerd fonts to v3.2.1
+* Bump gh actions
+
+## v6.2+v3.1.1
+
+* Bump nerd fonts to v3.1.1
+
 ## v6.2+v3.0.2
 
 **Initial release**
