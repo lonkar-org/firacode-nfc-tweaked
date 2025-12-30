@@ -29,7 +29,7 @@ jobs:
           git tag -f "${{ needs.ci.outputs.version }}"
           git push -f origin "${{ needs.ci.outputs.version }}"
           mkdir dist
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: fonts
           path: dist
