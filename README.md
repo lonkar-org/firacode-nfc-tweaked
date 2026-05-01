@@ -1,6 +1,6 @@
 # firacode-nfc-tweaked
 
-Fira Code font tweaked and patched with Nerd Fonts Compete
+Fira Code font tweaked and patched with Nerd Fonts Complete
 
 ## Generate
 
@@ -55,7 +55,7 @@ Files in FiraCodeNerdFont.zip from [latest] release:
 
 I like the Fira Code font, but
 
-- I wanted to use the style variants as default instead of the default variants
+- I wanted to use the style variants as default instead of the default variant
 - I hate all default `i` and `l` variants
 - Nerd Font patched fonts
   - Don't have the complete set of glyphs
@@ -66,7 +66,7 @@ I like the Fira Code font, but
 
 I have not tested each character individually, but it should work.
 This project is for my personal use,
-I will try to fix any issues reported, but I cannot guarantee any timelines or if I fix it at all.
+I will try to fix any issues reported, but I cannot guarantee any timelines or if I will fix it at all.
 
 ## Changelog
 
