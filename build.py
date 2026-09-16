@@ -6,7 +6,8 @@ from generator import generate
 
 versions = {
     'fira_code': '6.2',
-    'nerd_font_patcher': 'v3.5.0',
+    'nerd_font_patcher': 'v3.5.1',
+    'noto_devanagari': 'v2.007',
 }
 
 
@@ -30,10 +31,11 @@ def main():
     ch = logging.StreamHandler()
     ch.setFormatter(LogFormatter())
     logging.basicConfig(level=logging.DEBUG, handlers=[ch])
-    generate(fira_code=versions['fira_code'], nerd_font_patcher=versions['nerd_font_patcher'])
+    generate(fira_code=versions['fira_code'], nerd_font_patcher=versions['nerd_font_patcher'],
+             noto_devanagari=versions['noto_devanagari'])
     if 'CI' not in os.environ or os.environ['CI'] != 'true' or 'GITHUB_OUTPUT' not in os.environ:
         return
-    version = 'v{}+{}\n'.format(versions['fira_code'], versions['nerd_font_patcher'])
+    version = 'v{}+{}+{}\n'.format(versions['fira_code'], versions['nerd_font_patcher'], versions['noto_devanagari'])
     logging.info('Writing version={} github output', version)
     with open(os.environ['GITHUB_OUTPUT'], 'w') as file:
         file.write('version={}\n'.format(version))

@@ -4,7 +4,9 @@ from os.path import dirname, realpath, join
 
 from .downloader import FiraCode, firacode_font_files
 from .downloader import NerdFontPatcher
-from .nerd_font import patch_nerd_font
+from .downloader import NotoDevanagari
+from .devanagari import patch_devanagari
+from .nerd_font import patch_nerd_font, nerd_font_files
 from .tweaks import patch_tweaks
 
 self_dir = dirname(realpath(__file__))
@@ -33,13 +35,15 @@ def copy_to_dist():
     logging.info('Copied all font files to dist')
 
 
-def generate(fira_code: str, nerd_font_patcher: str):
+def generate(fira_code: str, nerd_font_patcher: str, noto_devanagari: str):
     cleanup('dist', 'stage')
     setup('dist', 'stage', 'downloads')
     NerdFontPatcher(version=nerd_font_patcher, download_dir=downloads_dir, target_dir=stage_dir).download()
     FiraCode(version=fira_code, download_dir=downloads_dir, target_dir=stage_dir).download()
+    NotoDevanagari(version=noto_devanagari, download_dir=downloads_dir, target_dir=stage_dir).download()
     input_files = firacode_font_files
     patch_tweaks(input_files=input_files, patches_dir=patches_dir, stage_dir=stage_dir)
     patch_nerd_font(patch_files=input_files, stage_dir=stage_dir)
+    patch_devanagari(patch_files=nerd_font_files, stage_dir=stage_dir)
     copy_to_dist()
     cleanup('stage')

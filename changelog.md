@@ -2,6 +2,14 @@ CHANGELOG
 ================================================================================
 This project's version depends on the version of the fonts it uses.
 
+## v6.2+v3.5.1+v2.007
+
+* Merge [Noto Sans Devanagari v2.007](https://github.com/notofonts/devanagari/releases/tag/NotoSansDevanagari-v2.007)
+  into every variant (U+0900-097F, Devanagari Extended, Vedic Extensions, dotted circle, ZWNJ/ZWJ, rupee)
+  with full dev2 shaping; FiraCode vertical metrics unchanged
+* Version tag now `v<FiraCode>+<Nerd Fonts>+<Noto Sans Devanagari>`
+* Bump nerd fonts to v3.5.1
+
 ## v6.2+v3.2.1
 
 * Bump nerd fonts to v3.2.1

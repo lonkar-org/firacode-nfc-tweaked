@@ -1,6 +1,6 @@
 # firacode-nfc-tweaked
 
-Fira Code font tweaked and patched with Nerd Fonts Complete
+Fira Code font tweaked, patched with Nerd Fonts Complete, and merged with Noto Sans Devanagari
 
 ## Generate
 
@@ -8,6 +8,7 @@ Fira Code font tweaked and patched with Nerd Fonts Complete
 
 - [Python 3]
 - [fontforge]
+- `pip install -r requirements.txt` (fontTools for the Devanagari merge)
 
 To generate the patched font, run:
 
@@ -38,6 +39,12 @@ The build.py performs the following steps:
       | `}` -> `braceright.cv29` |
       | `\|` -> `bar.cv30`       |
    3. Nerd Fonts complete with `--careful`, `--complete` arguments
+   4. Devanagari from [Noto Sans Devanagari] [^3]: the variable font is instanced at
+      each FiraCode weight (Light 300 … Bold 700, Retina 450), subset to the Devanagari
+      blocks, rescaled to FiraCode's em, and merged with `fontTools.merge`. FiraCode's
+      vertical metrics are kept so line height does not change. See
+      `generator/devanagari.py` for why fontTools (not fontforge) and why the
+      Devanagari glyphs keep their proportional advances.
 3. Copy patched font variants to `dist` directory
 
 ## Font variants
@@ -61,6 +68,8 @@ I like the Fira Code font, but
   - Don't have the complete set of glyphs
   - Are monospaced while many term emulators (including iterm2) support non-monospaced fonts
 - I don't want to manually patch the font every time a new version of Fira Code or NerdFont is released
+- I write Marathi/Hindi mixed with English in the terminal; one font with correct Devanagari shaping beats
+  per-terminal fallback maps, and works the same on Linux where Kohinoor does not exist
 
 ## Support
 
@@ -79,13 +88,15 @@ Some of the files committed and used during the build process in this repository
 Which are updated in the [LICENSE] on the best effort basis.
 
 
-[^1]: https://github.com/ryanoasis/nerd-fonts/blob/v3.0.2/LICENSE
+[^1]: https://github.com/ryanoasis/nerd-fonts/blob/v3.5.1/LICENSE
 [^2]: https://github.com/tonsky/FiraCode/blob/6.2/LICENSE
+[^3]: https://github.com/notofonts/devanagari/blob/main/OFL.txt
 
 [Python 3]: https://www.python.org
 [fontforge]: https://fontforge.org
 [Nerd Fonts releases]: https://github.com/ryanoasis/nerd-fonts/releases
 [FiraCode releases]: https://github.com/tonsky/FiraCode/releases
+[Noto Sans Devanagari]: https://github.com/notofonts/devanagari/releases
 [patches]: ./patches
 [latest]: https://github.com/yogeshlonkar/firacode-nfc-tweaked/releases/latest
 [changelog.md]: ./changelog.md
