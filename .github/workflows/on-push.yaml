@@ -9,8 +9,17 @@ on:
   workflow_call:
     outputs:
       version:
-        description: Version of the built fonts
+        description: This project's version, from the VERSION file
         value: ${{ jobs.build-fonts.outputs.version }}
+      fira_code:
+        description: FiraCode version the fonts were built from
+        value: ${{ jobs.build-fonts.outputs.fira_code }}
+      nerd_font_patcher:
+        description: Nerd Fonts font-patcher version the fonts were built with
+        value: ${{ jobs.build-fonts.outputs.nerd_font_patcher }}
+      noto_devanagari:
+        description: Noto Sans Devanagari version merged into the fonts
+        value: ${{ jobs.build-fonts.outputs.noto_devanagari }}
 
 jobs:
   build-fonts:
@@ -20,6 +29,9 @@ jobs:
     runs-on: ubuntu-24.04
     outputs:
       version: ${{ steps.build.outputs.version }}
+      fira_code: ${{ steps.build.outputs.fira_code }}
+      nerd_font_patcher: ${{ steps.build.outputs.nerd_font_patcher }}
+      noto_devanagari: ${{ steps.build.outputs.noto_devanagari }}
     steps:
       - uses: actions/checkout@v7
       - name: Install dependencies

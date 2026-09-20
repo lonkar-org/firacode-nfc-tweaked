@@ -11,12 +11,35 @@ jobs:
   ci:
     uses: ./.github/workflows/on-push.yaml
 
+  # Separate job, and deliberately outside the `github` environment: a push
+  # that does not bump VERSION must not queue a deployment for approval.
+  tag:
+    name: Check tag
+    needs: ci
+    runs-on: ubuntu-24.04
+    outputs:
+      exists: ${{ steps.check.outputs.exists }}
+    steps:
+      - uses: actions/checkout@v7
+      - id: check
+        env:
+          VERSION: ${{ needs.ci.outputs.version }}
+        run: |
+          if git ls-remote --exit-code --tags origin "refs/tags/$VERSION" >/dev/null 2>&1; then
+            echo 'exists=true' >> "$GITHUB_OUTPUT"
+            echo "::notice::$VERSION is already released. Bump VERSION to cut a new release."
+          else
+            echo 'exists=false' >> "$GITHUB_OUTPUT"
+          fi
+
   release:
     name: Release ${{ needs.ci.outputs.version }}
     environment: github
-    if: github.ref_name == 'main'
-    needs: ci
-    runs-on: ubuntu-latest
+    # A released tag is never moved: whoever downloaded it has the bytes this
+    # build produced. Cutting a release is a VERSION bump, nothing else.
+    if: github.ref_name == 'main' && needs.tag.outputs.exists == 'false'
+    needs: [ci, tag]
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
     steps:
@@ -25,9 +48,11 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-      - run: |
-          git tag -f "${{ needs.ci.outputs.version }}"
-          git push -f origin "${{ needs.ci.outputs.version }}"
+      - env:
+          VERSION: ${{ needs.ci.outputs.version }}
+        run: |
+          git tag "$VERSION"
+          git push origin "$VERSION"
           mkdir dist
       - uses: actions/download-artifact@v8
         with:
@@ -44,5 +69,11 @@ jobs:
         with:
           tag_name: ${{ needs.ci.outputs.version }}
           generate_release_notes: true
+          body: |
+            Built from:
+
+            - FiraCode ${{ needs.ci.outputs.fira_code }}
+            - Nerd Fonts ${{ needs.ci.outputs.nerd_font_patcher }}
+            - Noto Sans Devanagari ${{ needs.ci.outputs.noto_devanagari }}
           files: |
             FiraCodeNerdFont.zip

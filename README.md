@@ -94,6 +94,16 @@ I have not tested each character individually, but it should work.
 This project is for my personal use,
 I will try to fix any issues reported, but I cannot guarantee any timelines or if I will fix it at all.
 
+## Versioning
+
+Releases are SemVer, from the `VERSION` file: major for a change that breaks an existing
+install, minor for an upstream font bump or a new feature, patch for build-only fixes. The
+FiraCode, Nerd Fonts and Noto Sans Devanagari versions behind a release are in its release
+notes, and pinned with their checksums in `build.py`.
+
+A release is cut only when `VERSION` changes, and a published tag is never moved. Releases
+before v1.0.0 used `v<FiraCode>+<Nerd Fonts>[+<Noto Sans Devanagari>]` as the tag.
+
 ## Changelog
 
 See [changelog.md]

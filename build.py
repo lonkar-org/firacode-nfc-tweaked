@@ -1,8 +1,15 @@
 #!/usr/bin/env python3
 import logging
 import os
+from os.path import abspath, dirname, join
 
 from generator import generate
+
+# This project's own version, plain SemVer, bumped by hand: major for a change
+# that breaks an existing install (family rename, coverage dropped), minor for
+# an upstream font bump or a new feature, patch for build-only fixes. The
+# upstream versions it was built from go in the release notes, see `sources`.
+version_file = join(dirname(abspath(__file__)), 'VERSION')
 
 # Upstream releases, pinned by version and by the sha256 of the archive that
 # version served. The glyphs end up in a font people install system wide, so a
@@ -49,13 +56,15 @@ def main():
              noto_devanagari=sources['noto_devanagari'])
     if 'CI' not in os.environ or os.environ['CI'] != 'true' or 'GITHUB_OUTPUT' not in os.environ:
         return
-    version = 'v{}+{}+{}'.format(sources['fira_code']['version'], sources['nerd_font_patcher']['version'],
-                                 sources['noto_devanagari']['version'])
-    logging.info('Writing version=%s github output', version)
+    with open(version_file) as file:
+        outputs = {'version': 'v{}'.format(file.read().strip())}
+    outputs.update({name: source['version'] for name, source in sources.items()})
+    logging.info('Writing %s to the github output', outputs)
     # Appended: every step of the job shares this file, opening it 'w' drops
     # the outputs the earlier ones wrote.
     with open(os.environ['GITHUB_OUTPUT'], 'a') as file:
-        file.write('version={}\n'.format(version))
+        for name, value in outputs.items():
+            file.write('{}={}\n'.format(name, value))
 
 
 if __name__ == "__main__":
