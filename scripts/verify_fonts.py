@@ -31,11 +31,24 @@ expected_fonts = [
 ]
 
 # Characters that must have a glyph: Latin, a FiraCode ligature component, one
-# icon from each of three Nerd Font glyph sets, Devanagari ka, a matra, the
+# icon from each of four Nerd Font glyph sets, Devanagari ka, a matra, the
 # rupee. The icons are codepoints stock FiraCode does not carry, so they only
 # pass if the patcher actually ran; the powerline arrows would not do, FiraCode
 # ships those itself. F0001 is beyond the BMP, which --complete must reach.
-expected_characters = [0x0041, 0x003D, 0xE5BB, 0xF001, 0xF0001, 0x0915, 0x093F, 0x20B9]
+# The patcher remaps its glyph sources, so these are the target codepoints out
+# of glyphnames.json in FontPatcher.zip, not the ones in the source fonts.
+# Read that file again on a patcher bump: the Font Awesome set moved once.
+expected_characters = [
+    0x0041,   # A
+    0x003D,   # =, a ligature component
+    0xE613,   # seti-folder
+    0xED00,   # fa-location_dot
+    0xF300,   # linux-alpine, from font-logos
+    0xF0001,  # md-vector_square, beyond the BMP
+    0x0915,   # क
+    0x093F,   # ि
+    0x20B9,   # ₹
+]
 
 # Stylistic variants swapped in by generator/tweaks.py.
 swap = {
