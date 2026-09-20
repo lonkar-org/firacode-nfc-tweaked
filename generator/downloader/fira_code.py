@@ -16,8 +16,9 @@ firacode_font_files = [
 class FiraCode(UrlDownloader):
     """Fira Code Font downloader."""
 
-    def __init__(self, version: str, download_dir: str, target_dir: str):
+    def __init__(self, version: str, download_dir: str, target_dir: str, sha256: str = None):
         self.version = version
         filename = relpath(join(download_dir, 'fira_code_{}.zip'.format(self.version)))
-        super().__init__(url_template.format(self.version), filename, download_dir, target_dir, firacode_font_files)
+        super().__init__(url_template.format(self.version), filename, download_dir, target_dir, firacode_font_files,
+                         sha256)
         self.strip = 1

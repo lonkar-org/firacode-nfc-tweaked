@@ -1,6 +1,8 @@
 import logging
 import os
-from os.path import dirname, realpath, join
+import shutil
+from glob import glob
+from os.path import dirname, realpath, join, basename
 
 from .downloader import FiraCode, firacode_font_files
 from .downloader import NerdFontPatcher
@@ -27,20 +29,33 @@ def cleanup(*dirs: str):
     """Recursively remove directories relative to the current working directory"""
     for _dir in dirs:
         _dir = join(self_dir, '..', _dir)
-        os.system('rm -rf {}'.format(_dir))
+        shutil.rmtree(_dir, ignore_errors=True)
 
 
 def copy_to_dist():
-    os.system('cd {stage}; cp FiraCodeNerdFont*.ttf {dist}; cd {dist}; ls -1'.format(stage=stage_dir, dist=dist_dir))
+    """Copy the built fonts to dist, failing if the patcher produced none."""
+    # Was a shelled out `cp` whose exit code nobody read: a renamed patcher
+    # output left dist empty and the release still shipped a fontless zip.
+    font_files = sorted(glob(join(stage_dir, 'FiraCodeNerdFont*.ttf')))
+    if len(font_files) != len(nerd_font_files):
+        raise RuntimeError('Expected {} built fonts in {}, found {}'.format(
+            len(nerd_font_files), stage_dir, [basename(file) for file in font_files]))
+    for file in font_files:
+        shutil.copy(file, join(dist_dir, basename(file)))
+        logging.debug('Copied %s to dist', basename(file))
     logging.info('Copied all font files to dist')
 
 
-def generate(fira_code: str, nerd_font_patcher: str, noto_devanagari: str):
+def generate(fira_code: dict, nerd_font_patcher: dict, noto_devanagari: dict):
+    """Build the fonts from the pinned sources, each a {version, sha256} dict."""
     cleanup('dist', 'stage')
     setup('dist', 'stage', 'downloads')
-    NerdFontPatcher(version=nerd_font_patcher, download_dir=downloads_dir, target_dir=stage_dir).download()
-    FiraCode(version=fira_code, download_dir=downloads_dir, target_dir=stage_dir).download()
-    NotoDevanagari(version=noto_devanagari, download_dir=downloads_dir, target_dir=stage_dir).download()
+    NerdFontPatcher(version=nerd_font_patcher['version'], sha256=nerd_font_patcher['sha256'],
+                    download_dir=downloads_dir, target_dir=stage_dir).download()
+    FiraCode(version=fira_code['version'], sha256=fira_code['sha256'],
+             download_dir=downloads_dir, target_dir=stage_dir).download()
+    NotoDevanagari(version=noto_devanagari['version'], sha256=noto_devanagari['sha256'],
+                   download_dir=downloads_dir, target_dir=stage_dir).download()
     input_files = firacode_font_files
     patch_tweaks(input_files=input_files, patches_dir=patches_dir, stage_dir=stage_dir)
     patch_nerd_font(patch_files=input_files, stage_dir=stage_dir)

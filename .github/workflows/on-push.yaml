@@ -15,25 +15,35 @@ on:
 jobs:
   build-fonts:
     name: Build fonts
-    runs-on: ubuntu-latest
+    # Pinned, not ubuntu-latest: fontforge draws the outlines, so a silent
+    # runner image bump would change the binaries with no commit behind it.
+    runs-on: ubuntu-24.04
     outputs:
       version: ${{ steps.build.outputs.version }}
     steps:
       - uses: actions/checkout@v7
       - name: Install dependencies
         run: |
+          sudo apt-get update
           sudo apt-get install -y fontforge python3-fontforge
           pip install -r requirements.txt
+          fontforge --version
       - name: Cache downloads
         id: cache-downloads
         uses: actions/cache@v6
         with:
           path: downloads
-          key: ${{ runner.os }}-downloads
+          # Keyed on build.py, which pins every upstream version and checksum:
+          # a constant key is only ever written once, so version bumps would
+          # re-download on every run and the cache would never be refreshed.
+          key: ${{ runner.os }}-downloads-${{ hashFiles('build.py') }}
       - name: Build
         id: build
         run: ./build.py
+      - name: Verify fonts
+        run: ./scripts/verify_fonts.py dist downloads
       - uses: actions/upload-artifact@v7
         with:
           name: fonts
           path: dist
+          if-no-files-found: error

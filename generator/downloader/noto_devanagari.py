@@ -11,11 +11,11 @@ noto_devanagari_variable_font = 'NotoSansDevanagari[wght].ttf'
 class NotoDevanagari(UrlDownloader):
     """Noto Sans Devanagari font downloader."""
 
-    def __init__(self, version: str, download_dir: str, target_dir: str):
+    def __init__(self, version: str, download_dir: str, target_dir: str, sha256: str = None):
         self.version = version
         filename = relpath(join(download_dir, 'noto_sans_devanagari_{}.zip'.format(self.version)))
         super().__init__(url_template.format(self.version), filename, download_dir, target_dir,
-                         [noto_devanagari_variable_font])
+                         [noto_devanagari_variable_font], sha256)
 
     def extract_zip(self, archive):
         # The release zip ships the same file name under hinted/, unhinted/ and

@@ -1,3 +1,4 @@
+import hashlib
 import logging
 import tarfile
 import zipfile
@@ -6,14 +7,18 @@ from urllib.request import urlretrieve
 
 from .progress import show_progress
 
+read_block_size = 1024 * 1024
+
 
 class UrlDownloader:
     """URL file downloader."""
 
-    def __init__(self, url: str, filename: str, download_dir: str, target_dir: str, files: list[str] = None):
+    def __init__(self, url: str, filename: str, download_dir: str, target_dir: str, files: list[str] = None,
+                 sha256: str = None):
         self.url = url
         self.filename = filename
         self.files = files
+        self.sha256 = sha256
         self.strip = 0
         self.download_dir = download_dir
         self.target_dir = target_dir
@@ -61,12 +66,28 @@ class UrlDownloader:
                     continue
                 archive.extract(zip_info, self.target_dir)
 
+    def verify(self):
+        """Fail unless the archive matches the pinned sha256."""
+        if self.sha256 is None:
+            return
+        digest = hashlib.sha256()
+        with open(self.filename, 'rb') as file:
+            for block in iter(lambda: file.read(read_block_size), b''):
+                digest.update(block)
+        if digest.hexdigest() != self.sha256:
+            raise ValueError('{} sha256 is {}, expected {}'.format(self.filename, digest.hexdigest(), self.sha256))
+        logging.debug('Verified sha256 of %s', self.filename)
+
     def download(self):
         """Download and process the file."""
         if exists(self.filename):
             logging.debug('Skipped %s download, required file already exists', self.url.split('/')[-1].split('?')[0])
+            # Cached copies are verified too: the CI cache is writable by any
+            # workflow run, so it is not more trusted than the network.
+            self.verify()
             self.extract()
             return
         logging.info('Downloading %s to %s', self.url, self.filename)
         urlretrieve(self.url, self.filename, show_progress)
+        self.verify()
         self.extract()

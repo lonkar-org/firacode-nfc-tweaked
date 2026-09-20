@@ -9,6 +9,14 @@ This project's version depends on the version of the fonts it uses.
   with full dev2 shaping; FiraCode vertical metrics unchanged
 * Version tag now `v<FiraCode>+<Nerd Fonts>+<Noto Sans Devanagari>`
 * Bump nerd fonts to v3.5.1
+* Built fonts carry the Noto copyright line in their name table alongside FiraCode's
+* Downloads pinned by sha256 in `build.py` and verified before use, cached copies included
+* `scripts/verify_fonts.py` smoke tests the build, and CI fails on a bad one
+* Fixed the CI download cache never refreshing, so version bumps re-downloaded every run
+* Build fails instead of releasing a fontless zip when the patcher produces nothing
+* Pinned the CI runner to ubuntu-24.04, since fontforge draws the outlines
+* Release zip ships `OFL.txt` (fonts are SIL OFL 1.1, all upstream copyright lines) instead of the
+  repository MIT `LICENSE`, which now covers only the build code
 
 ## v6.2+v3.2.1
 

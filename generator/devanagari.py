@@ -58,6 +58,8 @@ vertical_metrics = {
 
 os2_unicode_range_devanagari_bit = 15
 
+copyright_name_id = 0
+
 
 def devanagari_instance(variable_font: str, weight: int, upem: int) -> TTFont:
     """Static Devanagari-only instance at `weight`, rescaled to `upem`."""
@@ -74,15 +76,32 @@ def devanagari_instance(variable_font: str, weight: int, upem: int) -> TTFont:
     return font
 
 
+def append_copyright(font: TTFont, notice: str):
+    """Append `notice` to every copyright name record that lacks it."""
+    for record in font['name'].names:
+        if record.nameID != copyright_name_id:
+            continue
+        text = record.toUnicode()
+        if notice in text:
+            continue
+        record.string = '{}; {}'.format(text, notice)
+
+
 def merge_devanagari(font_path: str, variable_font: str, weight: int):
     """Merge a Devanagari instance into the font at `font_path`, in place."""
     base = TTFont(font_path)
     upem = base['head'].unitsPerEm
     devanagari_path = font_path + '.devanagari.ttf'
-    devanagari_instance(variable_font, weight, upem).save(devanagari_path)
+    devanagari = devanagari_instance(variable_font, weight, upem)
+    noto_copyright = devanagari['name'].getDebugName(copyright_name_id)
+    devanagari.save(devanagari_path)
     # First font wins on cmap conflicts and supplies the name table, so
     # FiraCode's Latin, its ligatures and the Nerd Font names are untouched.
     merged = Merger().merge([font_path, devanagari_path])
+    # The dropped Noto name table takes its copyright line with it; OFL 2) wants
+    # that notice to travel inside the binary too, not only in the OFL.txt next
+    # to it, since a lone .ttf gets copied out of the release zip.
+    append_copyright(merged, noto_copyright)
     for table, attrs in vertical_metrics.items():
         for attr in attrs:
             setattr(merged[table], attr, getattr(base[table], attr))

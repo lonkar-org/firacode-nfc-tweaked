@@ -36,7 +36,7 @@ jobs:
       - name: Zip fonts
         run: |
           cd dist
-          cp ../LICENSE ../changelog.md .
+          cp ../OFL.txt ../changelog.md .
           zip -r ../FiraCodeNerdFont.zip .
       - name: Release
         id: release

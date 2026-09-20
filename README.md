@@ -8,7 +8,7 @@ Fira Code font tweaked, patched with Nerd Fonts Complete, and merged with Noto S
 
 - [Python 3]
 - [fontforge]
-- `pip install -r requirements.txt` (fontTools for the Devanagari merge)
+- `pip install -r requirements.txt` (fontTools for the Devanagari merge and the verifier)
 
 To generate the patched font, run:
 
@@ -20,9 +20,11 @@ To generate the patched font, run:
 
 The build.py performs the following steps:
 
-1. Download
-   1. Nerd Fonts patched from [Nerd Fonts releases] [^1]
+1. Download, each pinned to a version and a sha256 in `build.py` and verified before use,
+   cached copies included
+   1. Nerd Fonts font-patcher from [Nerd Fonts releases] [^1]
    2. FiraCode from [FiraCode releases] [^2]
+   3. Noto Sans Devanagari from [Noto Sans Devanagari] [^3]
 2. Patch Fira Code font variants with
    1. Tweaks to characters `i` and `l`. see sfd files in [patches] for details
    2. Swap glyphs within Fire Code font variants to become default instead of style variants
@@ -44,19 +46,34 @@ The build.py performs the following steps:
       blocks, rescaled to FiraCode's em, and merged with `fontTools.merge`. FiraCode's
       vertical metrics are kept so line height does not change. See
       `generator/devanagari.py` for why fontTools (not fontforge) and why the
-      Devanagari glyphs keep their proportional advances.
+      Devanagari glyphs keep their proportional advances. The Noto copyright line is
+      added to the font's name table next to FiraCode's, as the OFL asks.
 3. Copy patched font variants to `dist` directory
+
+Then `./scripts/verify_fonts.py dist downloads` checks the result, and CI fails the build
+if it does not pass: all six weights present, Devanagari and Nerd Font icons reachable,
+`dev2` shaping in GSUB, the stylistic swaps and the `i`/`l` tweaks actually applied, one
+line height across weights, both copyright lines in the name table.
 
 ## Font variants
 
-Files in FiraCodeNerdFont.zip from [latest] release:
+Six weights, one per FiraCode weight, in FiraCodeNerdFont.zip from the [latest] release.
+They share the family name `FiraCode Nerd Font`; the weight is in the subfamily, as the
+patcher sets it. There are no italics or obliques, because FiraCode ships none.
 
-| File Name                        | Font Name              | Family Name        | Name for Humans                 |
-|:---------------------------------|:-----------------------|:-------------------|:--------------------------------|
-| FiraCodeNerdFont-Regular.ttf     | FiraCodeNF-Regular     | FiraCode Nerd Font | FiraCode Nerd Font Regular      |
-| FiraCodeNerdFont-Bold.ttf        | FiraCodeNF-Bold        | FiraCode Nerd Font | FiraCode Nerd Font Bold         |
-| FiraCodeNerdFont-Oblique.ttf     | FiraCodeNF-Oblique     | FiraCode Nerd Font | FiraCode Nerd Font Oblique      |
-| FiraCodeNerdFont-BoldOblique.ttf | FiraCodeNF-BoldOblique | FiraCode Nerd Font | FiraCode Nerd Font Bold Oblique |
+| File Name                      | Weight   | Devanagari instance (`wght`) |
+|:-------------------------------|:---------|:-----------------------------|
+| FiraCodeNerdFont-Light.ttf     | Light    | 300                          |
+| FiraCodeNerdFont-Regular.ttf   | Regular  | 400                          |
+| FiraCodeNerdFont-Retina.ttf    | Retina   | 450                          |
+| FiraCodeNerdFont-Medium.ttf    | Medium   | 500                          |
+| FiraCodeNerdFont-SemiBold.ttf  | SemiBold | 600                          |
+| FiraCodeNerdFont-Bold.ttf      | Bold     | 700                          |
+
+Each file carries, on top of stock FiraCode: the `i`/`l` tweaks, the stylistic variants
+swapped in as defaults, the complete Nerd Fonts icon set, and Noto Sans Devanagari with
+full `dev2` shaping (Devanagari, Devanagari Extended, Vedic Extensions, ZWNJ/ZWJ, rupee).
+The zip also holds `OFL.txt` and `changelog.md`.
 
 ## Why?
 
@@ -83,9 +100,17 @@ See [changelog.md]
 
 ## License
 
-This repository is licensed under the MIT License;
-Some of the files committed and used during the build process in this repository follow the licenses from their source location,
-Which are updated in the [LICENSE] on the best effort basis.
+Two licenses, split by what the file is:
+
+- **Fonts: [SIL Open Font License 1.1][OFL.txt].** The built `FiraCodeNerdFont-*.ttf` and the glyph sources in
+  [patches] are Modified Versions of Fira Code, Noto Sans Devanagari and the Nerd Fonts icon sets, and the OFL
+  requires derivatives to stay under the OFL. [OFL.txt] carries every upstream copyright line and ships in the
+  release zip next to the fonts.
+- **Build code: [MIT][LICENSE].** `build.py`, `generator/` and the CI workflows.
+
+No upstream Reserved Font Name is used by the family name `FiraCode Nerd Font`: Fira Code 6.2 [^2],
+Noto Sans Devanagari v2.007 [^3] and Nerd Fonts v3.5.1 [^1] declare none; the Pomicons icon set reserves
+"Pomicons" only.
 
 
 [^1]: https://github.com/ryanoasis/nerd-fonts/blob/v3.5.1/LICENSE
@@ -101,3 +126,4 @@ Which are updated in the [LICENSE] on the best effort basis.
 [latest]: https://github.com/yogeshlonkar/firacode-nfc-tweaked/releases/latest
 [changelog.md]: ./changelog.md
 [LICENSE]: ./LICENSE
+[OFL.txt]: ./OFL.txt
